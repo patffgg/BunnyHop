@@ -1,4 +1,3 @@
-
 import pygame as pg
 import random
 from settings import *
@@ -7,6 +6,7 @@ from pygame.locals import QUIT
 
 
 class Game:
+
   def __init__(self):
     pg.init()
     self.screen = pg.display.set_mode((WIDTH, HEIGHT))
@@ -26,7 +26,6 @@ class Game:
       self.all_sprites.add(p)
       self.platforms.add(p)
     self.run()
-
 
   def run(self):
     self.playing = True
@@ -62,10 +61,11 @@ class Game:
 
       while len(self.platforms) < 6:
         width = random.randrange(50, 100)
-        p = Platform(random.randrange(0, WIDTH - width),random.randrange(-75, -30),width,20)
+        p = Platform(random.randrange(0, WIDTH - width),
+                     random.randrange(-75, -30), width, 20)
         self.platforms.add(p)
         self.all_sprites.add(p)
-  
+
   def events(self):
     for event in pg.event.get():
       if event.type == pg.QUIT:
@@ -84,7 +84,7 @@ class Game:
 
   def show_start_screen(self):
     pass
-    
+
   def show_go_screen(self):
     pass
 
@@ -95,6 +95,7 @@ class Game:
     text_rect.midtop = (x, y)
     surf.blit(text_surface, text_rect)
 
+
 g = Game()
 g.show_start_screen()
 while g.running:
@@ -102,4 +103,3 @@ while g.running:
   g.show_go_screen()
 
 pg.quit()
-    
