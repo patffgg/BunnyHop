@@ -3,12 +3,11 @@ import random
 from settings import *
 from sprites import *
 from os import path
-from pygame.locals import QUIT
 
 
 class Game:
-
   def __init__(self):
+    pg.init()
     self.highscore = 0
     self.score = 0
     pg.init()
@@ -17,14 +16,17 @@ class Game:
     self.clock = pg.time.Clock()
     self.running = True
     self.font_name = pg.font.match_font(FONT_NAME)
+    self.load_data()
 
   def load_data(self):
-    self.dir∑= path.dirname(__file__)
+    self.dir = path.dirname(__file__)
+    img_dir = path.join(self.dir, 'img')
     with open(path.join(self.dir, HS_FILE), 'r') as f:
       try:
         self.highscore = int(f.read())
       except:
         self.highscore = 0
+    self.spritesheet = Spritesheet(path.join(img_dir, SPRITESHEET))
 
   def new(self):
     self.score = 0
@@ -67,15 +69,15 @@ class Game:
         sprite.rect.y -= max(self.player.vel.y, 10)
         if sprite.rect.bottom < 0:
           sprite.kill()
-      if len(self.platforms) == 0:
-        self.playing = False
+    if len(self.platforms) == 0:
+      self.playing = False
 
-      while len(self.platforms) < 6:
-        width = random.randrange(50, 100)
-        p = Platform(random.randrange(0, WIDTH - width),
-                     random.randrange(-75, -30), width, 20)
-        self.platforms.add(p)
-        self.all_sprites.add(p)
+    while len(self.platforms) < 6:
+      width = random.randrange(50, 100)
+      p = Platform(random.randrange(0, WIDTH - width),
+                   random.randrange(-75, -30), width, 20)
+      self.platforms.add(p)
+      self.all_sprites.add(p)
 
   def events(self):
     for event in pg.event.get():
@@ -110,9 +112,9 @@ class Game:
     self.screen.fill(BGCOLOR)
     self.draw_text("GAME OVER", 48, WHITE, WIDTH / 2, HEIGHT / 4)
     self.draw_text("Score: " + str(self.score), 22, WHITE, WIDTH / 2,
-                   HEIGHT / 2 + 40)
+                   HEIGHT / 2)
     self.draw_text("Press a key to play again", 22, WHITE, WIDTH / 2,
-                   HEIGHT / 2 + 40)
+                   HEIGHT * 3 / 4)
     if self.score > self.highscore:
       self.highscore = self.score
       self.draw_text("NEW HIGH SCORE", 22, WHITE, WIDTH / 2, HEIGHT / 2 + 40)
