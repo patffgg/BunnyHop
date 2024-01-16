@@ -42,7 +42,7 @@ class Player(pg.sprite.Sprite):
       frame.set_colorkey(BLACK)
     self.walk_frames_r = [
         self.game.spritesheet.get_image(678, 860, 120, 201),
-        self.game.spritesheet.get_imaget(692, 1458, 120, 207)
+        self.game.spritesheet.get_image(692, 1458, 120, 207)
     ]
     self.walk_frames_l = []
     for frame in self.walk_frames_r:
@@ -67,12 +67,9 @@ class Player(pg.sprite.Sprite):
     if keys[pg.K_RIGHT]:
       self.acc.x = PLAYER_ACC
 
-      # apply friction
       self.acc.x += self.vel.x * PLAYER_FRICTION
-      # equations of motion
       self.vel += self.acc
       self.pos += self.vel + 0.5 * self.acc
-      # wrap around the sides of the screen
       if self.pos.x > WIDTH:
         self.pos.x = 0
       if self.pos.x < 0:
@@ -95,7 +92,7 @@ class Player(pg.sprite.Sprite):
 
 class Platform(pg.sprite.Sprite):
 
-  def __init__(self, game, x, y):
+  def __init__(self, x, y, w, h):
     pg.sprite.Sprite.__init__(self)
     self.image = pg.Surface((w, h))
     self.image.set_colorkey(GREEN)

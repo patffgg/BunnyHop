@@ -8,9 +8,6 @@ from os import path
 class Game:
   def __init__(self):
     pg.init()
-    self.highscore = 0
-    self.score = 0
-    pg.init()
     self.screen = pg.display.set_mode((WIDTH, HEIGHT))
     pg.display.set_caption(TITLE)
     self.clock = pg.time.Clock()
@@ -35,7 +32,8 @@ class Game:
     self.player = Player(self)
     self.all_sprites.add(self.player)
     for plat in PLATFORM_LIST:
-      p = Platform(*plat)
+      print(*plat)
+      p = Platform(0, 560, 480, 40)
       self.all_sprites.add(p)
       self.platforms.add(p)
     self.run()
@@ -148,7 +146,7 @@ class Game:
 g = Game()
 g.show_start_screen()
 while g.running:
-  g.new
+  g.new()
   g.show_go_screen()
 
 pg.quit()
