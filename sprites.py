@@ -1,11 +1,10 @@
 import pygame as pg
 from settings import *
-
+from random import choice, gammavariate
 vec = pg.math.Vector2
 
 
 class Spritesheet:
-
   def __init__(self, filename):
     self.spritesheet = pg.image.load(filename).convert()
 
@@ -17,7 +16,6 @@ class Spritesheet:
 
 
 class Player(pg.sprite.Sprite):
-
   def __init__(self, game):
     pg.sprite.Sprite.__init__(self)
     self.game = game
@@ -28,8 +26,8 @@ class Player(pg.sprite.Sprite):
     self.load_images()
     self.image = self.standing_frames[0]
     self.rect = self.image.get_rect()
-    self.rect.center = (WIDTH / 2, HEIGHT / 2)
-    self.pos = vec(WIDTH / 2, HEIGHT / 2)
+    self.rect.center = (40, HEIGHT - 100)
+    self.pos = vec(40, HEIGHT - 100)
     self.vel = vec(0, 0)
     self.acc = vec(0, 0)
 
@@ -52,9 +50,9 @@ class Player(pg.sprite.Sprite):
     self.jump_frame.set_colorkey(BLACK)
 
   def jump(self):
-    self.rect.y += 1
+    self.rect.y += 2
     hits = pg.sprite.spritecollide(self, self.game.platforms, False)
-    self.rect.y -= 1
+    self.rect.y -= 2
     if hits:
       self.vel.y = -PLAYER_JUMP
 
@@ -69,21 +67,38 @@ class Player(pg.sprite.Sprite):
 
       self.acc.x += self.vel.x * PLAYER_FRICTION
       self.vel += self.acc
-      self.pos += self.vel + 0.5 * self.acc
-      if self.pos.x > WIDTH:
-        self.pos.x = 0
-      if self.pos.x < 0:
-        self.pos.x = WIDTH
+      if abs(self.vel.x) < 0.1:
+        self.vel.x = 0
+      if self.pos.x > WIDTH + self.rect.width / 2:
+        self.pos.x = 0 - self.rect.width / 2
+      if self.pos.x < 0 - self.rect.width / 2:
+        self.pos.x = WIDTH + self.rect.width / 2
 
       self.rect.midbottom = self.pos
 
   def animate(self):
     now = pg.time.get_ticks()
+    if self.vel.x != 0:
+      self.walking = True
+    else:
+      self.walking = False
+    if self.walking:
+      if now - self.last_update > 180:
+        self.last_update = now
+        self.current_frame = (self.current_frame + 1) % len(
+            self.walk_frames_l)
+        bottom = self.rect.bottom
+        if self.vel.x > 0:
+          self.image = self.walk_frames_r[self.current_frame]
+        else:
+          self.image = self.walk_frames_l[self.current_frame]
+        self.rect = self.image.get_rect()
+        self.rect.bottom = bottom
+
     if not self.jumping and not self.walking:
       if now - self.last_update > 350:
         self.last_update = now
-        self.current_frame = (self.current_frame + 1) % len(
-            self.standing_frames)
+        self.current_frame = (self.current_frame + 1) % len(self.standing_frames)
         bottom = self.rect.bottom
         self.image = self.standing_frames[self.current_frame]
         self.rect = self.image.get_rect()
@@ -91,11 +106,14 @@ class Player(pg.sprite.Sprite):
 
 
 class Platform(pg.sprite.Sprite):
-
-  def __init__(self, x, y, w, h):
+  def __init__(self, game, x, y):
     pg.sprite.Sprite.__init__(self)
-    self.image = pg.Surface((w, h))
-    self.image.set_colorkey(GREEN)
+    self.game = game
+    images = [
+        self.game.spritesheet.get_image(0, 288, 380, 94),
+        self.game.spritesheet.get_image(213, 1662, 201, 100)]
+    self.image = choice(images)
+    self.image.set_colorkey(BLACK)
     self.rect = self.image.get_rect()
     self.rect.x = x
     self.rect.y = y
