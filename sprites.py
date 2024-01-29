@@ -1,12 +1,9 @@
 import pygame as pg
 from settings import *
-from random import choice
-
+from random import choice, randrange
 vec = pg.math.Vector2
 
-
 class Spritesheet:
-
   def __init__(self, filename):
     self.spritesheet = pg.image.load(filename).convert()
 
@@ -18,9 +15,9 @@ class Spritesheet:
 
 
 class Player(pg.sprite.Sprite):
-
   def __init__(self, game):
-    pg.sprite.Sprite.__init__(self)
+    self.groups = game.all_sprites
+    pg.sprite.Sprite.__init__(self, self.groups)
     self.game = game
     self.walking = False
     self.jumping = False
@@ -61,7 +58,8 @@ class Player(pg.sprite.Sprite):
     self.rect.y += 2
     hits = pg.sprite.spritecollide(self, self.game.platforms, False)
     self.rect.y -= 2
-    if hits:
+    if hits and not self.jumping:
+      self.jumping = True
       self.vel.y = -PLAYER_JUMP
 
   def update(self):
@@ -115,7 +113,8 @@ class Player(pg.sprite.Sprite):
 
 class Platform(pg.sprite.Sprite):
   def __init__(self, game, x, y):
-    pg.sprite.Sprite.__init__(self)
+    self.groups = game.all_sprites, game.platforms
+    pg.sprite.Sprite.__init__(self, self.groups)
     self.game = game
     images = [
         self.game.spritesheet.get_image(0, 288, 380, 94),
@@ -126,3 +125,24 @@ class Platform(pg.sprite.Sprite):
     self.rect = self.image.get_rect()
     self.rect.x = x
     self.rect.y = y
+    if randrange(100) < POW_SPAWN_PCT:
+      Pow(self.game, self)
+
+class Pow(pg.sprite.Sprite):
+  def __init__(self, game, plat):
+    self.groups = game.all_sprites, game.powerups
+    pg.sprite.Sprite.__init__(self, self.groups)
+    self.game = game
+    self.plat = plat
+    self.type = choice(['boost'])
+    self.image = self.game.spritesheet.get_image(820, 1805, 71, 70)
+    self.image.set_colorkey(BLACK)
+    self.rect = self.image.get_rect()
+    self.centerx = self.plat.rect.centerx
+    self.rect.bottom = self.plat.rect.top - 5
+
+  def update(self):
+    self.rect.bottom = self.plat.rect.top - 5
+    if not self.game.platforms.has(self.plat):
+      self.kill()
+    

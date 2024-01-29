@@ -18,24 +18,23 @@ class Game:
 
   def load_data(self):
     self.dir = path.dirname(__file__)
-    img_dir = path.join(self.dir, 'img')
     with open(path.join(self.dir, HS_FILE), 'r') as f:
       try:
         self.highscore = int(f.read())
       except:
         self.highscore = 0
+    img_dir = path.join(self.dir, 'img')
     self.spritesheet = Spritesheet(path.join(img_dir, SPRITESHEET))
 
   def new(self):
     self.score = 0
     self.all_sprites = pg.sprite.Group()
     self.platforms = pg.sprite.Group()
+    self.powerups = pg.sprite.Group()
     self.player = Player(self)
     self.all_sprites.add(self.player)
     for plat in PLATFORM_LIST:
       p = Platform(self, *plat)
-      self.all_sprites.add(p)
-      self.platforms.add(p)
     self.run()
 
   def run(self):
@@ -55,11 +54,12 @@ class Game:
         for hit in hits:
           if hit.rect.bottom > lowest.rect.bottom:
             lowest = hit
-
-        if self.player.pos.y < lowest.rect.bottom:
-          self.player.pos.y = lowest.rect.top
-          self.player.vel.y = 0
-          self.player.jumping = False
+        if self.player.pos.x < lowest.rect.right + 10 and \
+          self.player.pos.x > lowest.rect.left - 10:
+          if self.player.pos.y < lowest.rect.centery:
+            self.player.pos.y = lowest.rect.top
+            self.player.vel.y = 0
+            self.player.jumping = False
 
     if self.player.rect.top <= HEIGHT / 4:
       self.player.pos.y += max(abs(self.player.vel.y), 2)
@@ -67,8 +67,14 @@ class Game:
         plat.rect.y += max(abs(self.player.vel.y), 2)
         if plat.rect.top >= HEIGHT:
           plat.kill()
-          self.score += 10
-
+          self.score += 10  
+          
+    pow_hits = pg.sprite.spritecollide(self.player, self.powerups, True)
+    for pow in pow_hits:
+      if pow.type == 'boost':
+        self.player.vel.y = -BOOST_POWER
+        self.player.jumping = False
+    
     if self.player.rect.bottom > HEIGHT:
       for sprite in self.all_sprites:
         sprite.rect.y -= max(self.player.vel.y, 10)
@@ -81,9 +87,7 @@ class Game:
       width = random.randrange(50, 100)
       p = Platform(self, random.randrange(0, WIDTH - width),
                    random.randrange(-75, -30))
-      self.platforms.add(p)
-      self.all_sprites.add(p)
-
+      
   def events(self):
     for event in pg.event.get():
       if event.type == pg.QUIT:
