@@ -9,17 +9,18 @@ SPRITESHEET = "spritesheet_jumper.png"
 PLAYER_ACC = 0.5
 PLAYER_FRICTION = -0.12
 PLAYER_GRAV = 0.8
-PLAYER_JUMP = 16
+PLAYER_JUMP = 29
 
 BOOST_POWER = 60
 POW_SPAWN_PCT = 7
+MOB_FREQ = 5000
+PLAYER_LAYER = 2
+PLATFORM_LAYER = 1
+POW_LAYER = 1
+MOB_LAYER = 2
 
-PLATFORM_LIST = [(0, HEIGHT - 60),
-                (WIDTH / 2 - 50, HEIGHT * 3 / 4 - 50),
-                (125, HEIGHT - 350),
-                (350, 200),
-                (175, 100)]
-
+PLATFORM_LIST = [(0, HEIGHT - 60), (WIDTH / 2 - 50, HEIGHT * 3 / 4 - 50),
+                 (125, HEIGHT - 350), (350, 200), (175, 100)]
 
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)

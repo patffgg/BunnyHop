@@ -31,10 +31,12 @@ class Game:
     self.all_sprites = pg.sprite.Group()
     self.platforms = pg.sprite.Group()
     self.powerups = pg.sprite.Group()
+    self.mobs = pg.sprite.Group()
     self.player = Player(self)
     self.all_sprites.add(self.player)
     for plat in PLATFORM_LIST:
       p = Platform(self, *plat)
+    self.mob_timer = 0
     self.run()
 
   def run(self):
@@ -47,6 +49,14 @@ class Game:
 
   def update(self):
     self.all_sprites.update()
+    now = pg.time.get_ticks()
+    if now - self.mob_timer > 5000 + random.choice([-1000, -500, 0, 500, 1000
+                                                    ]):
+      self.mob_timer = now
+      Mob(self)
+    mob_hits = pg.sprite.spritecollide(self.player, self.mobs, False)
+    if mob_hits:
+      self.playing = False
     if self.player.vel.y > 0:
       hits = pg.sprite.spritecollide(self.player, self.platforms, False)
       if hits:
@@ -63,18 +73,20 @@ class Game:
 
     if self.player.rect.top <= HEIGHT / 4:
       self.player.pos.y += max(abs(self.player.vel.y), 2)
+      for mob in self.mobs:
+        mob.rect.y += max(abs(self.player.vel.y), 2)
       for plat in self.platforms:
         plat.rect.y += max(abs(self.player.vel.y), 2)
         if plat.rect.top >= HEIGHT:
           plat.kill()
-          self.score += 10  
-          
+          self.score += 10
+
     pow_hits = pg.sprite.spritecollide(self.player, self.powerups, True)
     for pow in pow_hits:
       if pow.type == 'boost':
         self.player.vel.y = -BOOST_POWER
         self.player.jumping = False
-    
+
     if self.player.rect.bottom > HEIGHT:
       for sprite in self.all_sprites:
         sprite.rect.y -= max(self.player.vel.y, 10)
@@ -87,7 +99,7 @@ class Game:
       width = random.randrange(50, 100)
       p = Platform(self, random.randrange(0, WIDTH - width),
                    random.randrange(-75, -30))
-      
+
   def events(self):
     for event in pg.event.get():
       if event.type == pg.QUIT:
@@ -100,7 +112,7 @@ class Game:
       if event.type == pg.KEYUP:
         if event.key == pg.K_SPACE:
           self.player.jump_cut()
-    
+
   def draw(self):
     self.screen.fill(BGCOLOR)
     self.all_sprites.draw(self.screen)
