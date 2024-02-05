@@ -1,6 +1,6 @@
 import pygame as pg
 from settings import *
-from random import choice, randrange
+from random import choice, randrange, uniform
 
 vec = pg.math.Vector2
 
@@ -75,7 +75,6 @@ class Player(pg.sprite.Sprite):
       self.acc.x = -PLAYER_ACC
     if keys[pg.K_RIGHT]:
       self.acc.x = PLAYER_ACC
-
       self.acc.x += self.vel.x * PLAYER_FRICTION
       self.vel += self.acc
       if abs(self.vel.x) < 0.1:
@@ -114,6 +113,29 @@ class Player(pg.sprite.Sprite):
         self.image = self.standing_frames[self.current_frame]
         self.rect = self.image.get_rect()
         self.rect.bottom = bottom
+    self.mask = pg.mask.from_surface(self.image)
+
+
+class Cloud(pg.sprite.Sprite):
+
+  def __init__(self, game):
+    self._layer = CLOUD_LAYER
+    self.groups = game.all_sprites, game.clouds
+    pg.sprite.Sprite.__init__(self, self.groups)
+    self.game = game
+    self.image = choice(self.game.cloud_images)
+    self.image.set_colorkey(BLACK)
+    self.rect = self.image.get_rect()
+    scale = randrange(50, 101) / 100
+    self.image = pg.transform.scale(
+        self.image,
+        (int(self.rect.width * scale), int(self.rect.height * scale)))
+    self.rect.x = randrange(WIDTH - self.rect.width)
+    self.rect.y = randrange(-500, -50)
+
+  def update(self):
+    if self.rect.top > HEIGHT * 2:
+      self.kill()
 
 
 class Platform(pg.sprite.Sprite):
@@ -189,6 +211,7 @@ class Mob(pg.sprite.Sprite):
     else:
       self.image = self.image_down
     self.rect = self.image.get_rect()
+    self.mask = pg.mask.from_surface(self.image)
     self.rect.center = center
     self.rect.y += self.vy
     if self.rect.left > WIDTH + 100 or self.rect.right < -100:

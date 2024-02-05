@@ -4,9 +4,7 @@ from settings import *
 from sprites import *
 from os import path
 
-
 class Game:
-
   def __init__(self):
     pg.init()
     self.screen = pg.display.set_mode((WIDTH, HEIGHT))
@@ -25,18 +23,24 @@ class Game:
         self.highscore = 0
     img_dir = path.join(self.dir, 'img')
     self.spritesheet = Spritesheet(path.join(img_dir, SPRITESHEET))
-
+    self.cloud_images = []
+    for i in range(1, 4):
+      self.cloud_images.append(pg.image.load(path.join(img_dir, 'cloud{}.png'.format(i))).convert())
+  
   def new(self):
     self.score = 0
-    self.all_sprites = pg.sprite.Group()
-    self.platforms = pg.sprite.Group()
+    self.all_sprites = pg.sprite.LayeredUpdates()
+    self.platforms =  pg.sprite.Group()
     self.powerups = pg.sprite.Group()
     self.mobs = pg.sprite.Group()
+    self.clouds = pg.sprite.Group()
     self.player = Player(self)
-    self.all_sprites.add(self.player)
     for plat in PLATFORM_LIST:
       p = Platform(self, *plat)
     self.mob_timer = 0
+    for i in range(8):
+      c = Cloud(self)
+      c.rect.y += 500
     self.run()
 
   def run(self):
@@ -54,7 +58,7 @@ class Game:
                                                     ]):
       self.mob_timer = now
       Mob(self)
-    mob_hits = pg.sprite.spritecollide(self.player, self.mobs, False)
+    mob_hits = pg.sprite.spritecollide(self.player, self.mobs, False, pg.sprite.collide_mask)
     if mob_hits:
       self.playing = False
     if self.player.vel.y > 0:
@@ -72,7 +76,11 @@ class Game:
             self.player.jumping = False
 
     if self.player.rect.top <= HEIGHT / 4:
+      if random.randrange(100) < 15:
+        Cloud(self)
       self.player.pos.y += max(abs(self.player.vel.y), 2)
+      for cloud in self.clouds:
+        cloud.rect.y += max(abs(self.player.vel.y / 2), 2)
       for mob in self.mobs:
         mob.rect.y += max(abs(self.player.vel.y), 2)
       for plat in self.platforms:
@@ -97,7 +105,7 @@ class Game:
 
     while len(self.platforms) < 6:
       width = random.randrange(50, 100)
-      p = Platform(self, random.randrange(0, WIDTH - width),
+      Platform(self, random.randrange(0, WIDTH - width),
                    random.randrange(-75, -30))
 
   def events(self):
@@ -175,5 +183,5 @@ g.show_start_screen()
 while g.running:
   g.new()
   g.show_go_screen()
-
+  
 pg.quit()
