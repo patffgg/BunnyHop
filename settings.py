@@ -20,8 +20,11 @@ POW_LAYER = 1
 MOB_LAYER = 2
 CLOUD_LAYER = 0
 
-PLATFORM_LIST = [(0, HEIGHT - 60), (WIDTH / 2 - 50, HEIGHT * 3 / 4 - 50),
-                 (125, HEIGHT - 350), (350, 200), (175, 100)]
+PLATFORM_LIST = [(0, HEIGHT - 60), 
+                 (WIDTH / 2 - 50, HEIGHT * 3 / 4 - 50),
+                 (125, HEIGHT - 350),
+                 (350, 200), 
+                 (175, 100)]
 
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)

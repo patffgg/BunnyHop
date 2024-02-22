@@ -1,12 +1,9 @@
 import pygame as pg
 from settings import *
-from random import choice, randrange, uniform
-
+from random import choice, randrange
 vec = pg.math.Vector2
 
-
 class Spritesheet:
-
   def __init__(self, filename):
     self.spritesheet = pg.image.load(filename).convert()
 
@@ -16,9 +13,7 @@ class Spritesheet:
     image = pg.transform.scale(image, (width // 2, height // 2))
     return image
 
-
 class Player(pg.sprite.Sprite):
-
   def __init__(self, game):
     self._layer = PLAYER_LAYER
     self.groups = game.all_sprites
@@ -37,16 +32,12 @@ class Player(pg.sprite.Sprite):
     self.acc = vec(0, 0)
 
   def load_images(self):
-    self.standing_frames = [
-        self.game.spritesheet.get_image(614, 1063, 120, 191),
-        self.game.spritesheet.get_image(690, 406, 120, 201)
-    ]
+    self.standing_frames = [self.game.spritesheet.get_image(614, 1063, 120, 191),
+                            self.game.spritesheet.get_image(690, 406, 120, 201)]
     for frame in self.standing_frames:
       frame.set_colorkey(BLACK)
-    self.walk_frames_r = [
-        self.game.spritesheet.get_image(678, 860, 120, 201),
-        self.game.spritesheet.get_image(692, 1458, 120, 207)
-    ]
+    self.walk_frames_r = [self.game.spritesheet.get_image(678, 860, 120, 201),
+                          self.game.spritesheet.get_image(692, 1458, 120, 207)]
     self.walk_frames_l = []
     for frame in self.walk_frames_r:
       frame.set_colorkey(BLACK)
@@ -107,17 +98,14 @@ class Player(pg.sprite.Sprite):
     if not self.jumping and not self.walking:
       if now - self.last_update > 350:
         self.last_update = now
-        self.current_frame = (self.current_frame + 1) % len(
-            self.standing_frames)
+        self.current_frame = (self.current_frame + 1) % len(self.standing_frames)
         bottom = self.rect.bottom
         self.image = self.standing_frames[self.current_frame]
         self.rect = self.image.get_rect()
         self.rect.bottom = bottom
     self.mask = pg.mask.from_surface(self.image)
 
-
 class Cloud(pg.sprite.Sprite):
-
   def __init__(self, game):
     self._layer = CLOUD_LAYER
     self.groups = game.all_sprites, game.clouds
@@ -127,9 +115,8 @@ class Cloud(pg.sprite.Sprite):
     self.image.set_colorkey(BLACK)
     self.rect = self.image.get_rect()
     scale = randrange(50, 101) / 100
-    self.image = pg.transform.scale(
-        self.image,
-        (int(self.rect.width * scale), int(self.rect.height * scale)))
+    self.image = pg.transform.scale(self.image,(int(self.rect.width * scale),
+                                                int(self.rect.height * scale)))
     self.rect.x = randrange(WIDTH - self.rect.width)
     self.rect.y = randrange(-500, -50)
 
@@ -137,18 +124,14 @@ class Cloud(pg.sprite.Sprite):
     if self.rect.top > HEIGHT * 2:
       self.kill()
 
-
 class Platform(pg.sprite.Sprite):
-
   def __init__(self, game, x, y):
     self._layer = PLATFORM_LAYER
     self.groups = game.all_sprites, game.platforms
     pg.sprite.Sprite.__init__(self, self.groups)
     self.game = game
-    images = [
-        self.game.spritesheet.get_image(0, 288, 380, 94),
-        self.game.spritesheet.get_image(213, 1662, 201, 100)
-    ]
+    images = [self.game.spritesheet.get_image(0, 288, 380, 94),
+              self.game.spritesheet.get_image(213, 1662, 201, 100)]
     self.image = choice(images)
     self.image.set_colorkey(BLACK)
     self.rect = self.image.get_rect()
@@ -157,9 +140,7 @@ class Platform(pg.sprite.Sprite):
     if randrange(100) < POW_SPAWN_PCT:
       Pow(self.game, self)
 
-
 class Pow(pg.sprite.Sprite):
-
   def __init__(self, game, plat):
     self._layer = POW_LAYER
     self.groups = game.all_sprites, game.powerups
@@ -178,9 +159,7 @@ class Pow(pg.sprite.Sprite):
     if not self.game.platforms.has(self.plat):
       self.kill()
 
-
 class Mob(pg.sprite.Sprite):
-
   def __init__(self, game):
     self._layer = MOB_LAYER
     self.groups = game.all_sprites, game.mobs

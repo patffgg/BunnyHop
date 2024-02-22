@@ -25,8 +25,9 @@ class Game:
     self.spritesheet = Spritesheet(path.join(img_dir, SPRITESHEET))
     self.cloud_images = []
     for i in range(1, 4):
-      self.cloud_images.append(pg.image.load(path.join(img_dir, 'cloud{}.png'.format(i))).convert())
-  
+      self.cloud_images.append(pg.image.load(path.join(img_dir, 'cloud{}.png'.format(i)) 
+                                            ).convert())
+      
   def new(self):
     self.score = 0
     self.all_sprites = pg.sprite.LayeredUpdates()
@@ -36,7 +37,7 @@ class Game:
     self.clouds = pg.sprite.Group()
     self.player = Player(self)
     for plat in PLATFORM_LIST:
-      p = Platform(self, *plat)
+      Platform(self, *plat)
     self.mob_timer = 0
     for i in range(8):
       c = Cloud(self)
@@ -124,7 +125,6 @@ class Game:
   def draw(self):
     self.screen.fill(BGCOLOR)
     self.all_sprites.draw(self.screen)
-    self.screen.blit(self.player.image, self.player.rect)
     self.draw_text(str(self.score), 22, WHITE, WIDTH / 2, 15)
     pg.display.flip()
 
@@ -176,7 +176,6 @@ class Game:
     text_rect = text_surface.get_rect()
     text_rect.midtop = (x, y)
     self.screen.blit(text_surface, text_rect)
-
 
 g = Game()
 g.show_start_screen()
